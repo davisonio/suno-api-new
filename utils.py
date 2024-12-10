@@ -49,10 +49,26 @@ async def get_feeds(ids, token):
 
 
 async def generate_music(data, token):
-    headers = {"Authorization": f"Bearer {token}"}
-    api_url = f"{BASE_URL}/api/generate/v2/"
-    response = await fetch(api_url, headers, data)
-    return response
+    try:
+        headers = {"Authorization": f"Bearer {token}"}
+        api_url = f"{BASE_URL}/api/generate/v2/"
+        print(f"Calling Suno API: {api_url}")  # Debug
+        print(f"With data: {data}")  # Debug
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.post(api_url, headers=headers, json=data) as response:
+                print(f"Suno API response status: {response.status}")  # Debug
+                if response.status != 200:
+                    error_text = await response.text()
+                    print(f"Suno API error: {error_text}")  # Debug
+                    raise Exception(f"Suno API error: {error_text}")
+                resp = await response.json()
+                print(f"Successful response received")  # Debug
+                return resp
+    except Exception as e:
+        print(f"Error in generate_music: {str(e)}")  # Debug
+        print(f"Full error details: {repr(e)}")  # Debug
+        raise
 
 
 async def concat_music(data, token):
