@@ -35,13 +35,17 @@ async def generate(
     data: schemas.CustomModeGenerateParam, token: str = Depends(get_token)
 ):
     try:
+        print(f"Received request with data: {data.dict()}")  # Debug
+        print(f"Token: {token[:10]}...")  # Debug - only show first 10 chars
+        
         resp = await generate_music(data.dict(), token)
         return resp
     except Exception as e:
+        print(f"Error in generate endpoint: {str(e)}")  # Debug
+        print(f"Full error details: {repr(e)}")  # Debug
         raise HTTPException(
             detail=str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-
 
 @app.post("/generate/description-mode")
 async def generate_with_song_description(
